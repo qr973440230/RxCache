@@ -1,4 +1,4 @@
-package com.qr.core.library.rxcache.memory;
+package com.qr.core.library.rxcache.cache.memory;
 
 import com.qr.core.library.rxcache.entity.Record;
 

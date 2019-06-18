@@ -1,7 +1,7 @@
-package com.qr.core.library.rxcache.action;
+package com.qr.core.library.rxcache.cache.action;
 
-import com.qr.core.library.rxcache.memory.Memory;
-import com.qr.core.library.rxcache.persistence.Persistence;
+import com.qr.core.library.rxcache.cache.memory.Memory;
+import com.qr.core.library.rxcache.cache.persistence.Persistence;
 
 import java.util.ArrayList;
 import java.util.List;

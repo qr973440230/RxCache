@@ -1,8 +1,8 @@
-package com.qr.core.library.rxcache.provider.config;
+package com.qr.core.library.rxcache.configuration;
 
-import com.qr.core.library.rxcache.provider.evict.EvictDynamicGroup;
-import com.qr.core.library.rxcache.provider.evict.EvictDynamicKey;
-import com.qr.core.library.rxcache.provider.evict.EvictProvider;
+import com.qr.core.library.rxcache.configuration.evict.EvictDynamicGroupKey;
+import com.qr.core.library.rxcache.configuration.evict.EvictDynamicKey;
+import com.qr.core.library.rxcache.configuration.evict.EvictProvider;
 
 import io.reactivex.Observable;
 
@@ -68,7 +68,7 @@ public class ConfigProvider {
     }
 
     private void checkIntegrity(){
-        if(evictProvider instanceof EvictDynamicGroup && dynamicGroupKey.isEmpty()){
+        if(evictProvider instanceof EvictDynamicGroupKey && dynamicGroupKey.isEmpty()){
             String errorMsg = providerKey + "evictDynamicGroup && dynamicGroupKey.isEmpty()";
             throw new IllegalArgumentException(errorMsg);
         }

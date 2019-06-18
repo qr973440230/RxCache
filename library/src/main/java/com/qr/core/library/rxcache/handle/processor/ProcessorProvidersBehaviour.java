@@ -1,8 +1,8 @@
-package com.qr.core.library.rxcache.provider.processor;
+package com.qr.core.library.rxcache.handle.processor;
 
-import com.qr.core.library.rxcache.TwoLayersCache;
+import com.qr.core.library.rxcache.cache.TwoLayersCache;
 import com.qr.core.library.rxcache.entity.Record;
-import com.qr.core.library.rxcache.provider.config.ConfigProvider;
+import com.qr.core.library.rxcache.configuration.ConfigProvider;
 
 import java.util.concurrent.Callable;
 
@@ -17,25 +17,20 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
     }
 
     @Override
-    public <T> Observable<T> process(ConfigProvider configProvider) {
+    public <T> Observable<T> process(final ConfigProvider configProvider) {
         return Observable.defer(new Callable<ObservableSource<? extends T>>() {
             @Override
             public ObservableSource<? extends T> call() throws Exception {
-
-                return null;
+                // TODO: 根据配置进行缓存逻辑
+                return getData(configProvider);
             }
         });
     }
 
     private <T> Observable<T> getData(final  ConfigProvider configProvider){
+        // TODO: 处理数据
         Record<T> record = twoLayersCache.retrieve(configProvider.getProviderKey(), configProvider.getDynamicKey(), configProvider.getDynamicGroupKey(),
                 configProvider.isUseExpiredData(), configProvider.isEncrypted());
-
-        return null;
-    }
-
-    @Override
-    public Observable<Void> evictAll() {
-        return null;
+        return Observable.just(record.getData());
     }
 }
