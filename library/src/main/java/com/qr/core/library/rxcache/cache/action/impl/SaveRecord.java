@@ -5,25 +5,22 @@ import com.qr.core.library.rxcache.cache.action.Action;
 import com.qr.core.library.rxcache.cache.memory.Memory;
 import com.qr.core.library.rxcache.cache.persistence.Persistence;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class SaveRecord extends Action {
-    private final int maxMBPersistenceCache;
-    private final String encryptKey;
-    public SaveRecord(Memory memory, Persistence persistence, int maxMBPersistenceCache, String encryptKey) {
+    @Inject
+    public SaveRecord(Memory memory, Persistence persistence) {
         super(memory, persistence);
-        this.maxMBPersistenceCache = maxMBPersistenceCache;
-        this.encryptKey = encryptKey;
     }
 
-    public void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
-              final Object data,final long survivalTime,final boolean isEncrypted){
+    public<T> void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
+              final T data,final long survivalTime){
         String composeKey = composeKey(providerKey, dynamicKey, dynamicGroupKey);
-        Record<Object> record = new Record<Object>(data,survivalTime);
+        Record<T> record = new Record<T>(data,survivalTime);
         memory.put(composeKey,record);
-
-        if(persistence.storedMB() >= maxMBPersistenceCache){
-            // 超过最大存储上限
-        }else{
-            persistence.saveRecord(composeKey,record,isEncrypted,encryptKey);
-        }
+        persistence.saveRecord(composeKey,record);
     }
+
 }

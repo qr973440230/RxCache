@@ -1,8 +1,6 @@
 package com.qr.core.library.rxcache.proxy;
 
-import com.qr.core.library.rxcache.RxCache;
-import com.qr.core.library.rxcache.handle.processor.ProcessorProviders;
-import com.qr.core.library.rxcache.handle.processor.ProcessorProvidersBehaviour;
+import com.qr.core.library.rxcache.processor.ProcessorProviders;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,11 +15,9 @@ import io.reactivex.Single;
 
 public class ProxyProviders implements InvocationHandler {
     private ProcessorProviders processorProviders;
-    private ProxyTranslator proxyTranslator;
 
-    public ProxyProviders(RxCache.Builder builder,Class<?> clazz){
-        // TODO: 配置处理
-        proxyTranslator = new ProxyTranslator();
+    public ProxyProviders(ProcessorProviders processorProviders){
+        this.processorProviders = processorProviders;
     }
 
     @Override
@@ -29,7 +25,7 @@ public class ProxyProviders implements InvocationHandler {
         return Observable.defer(new Callable<ObservableSource<?>>() {
             @Override
             public ObservableSource<?> call() throws Exception {
-                Observable<Object> observable = processorProviders.process(proxyTranslator.processMethod(method, args));
+                Observable<Object> observable = processorProviders.process(method,args);
                 Class<?> returnType = method.getReturnType();
                 if(returnType == Observable.class){
                     return Observable.just(observable);

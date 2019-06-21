@@ -6,7 +6,12 @@ import com.qr.core.library.rxcache.cache.persistence.Persistence;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class EvictRecord extends Action {
+    @Inject
     public EvictRecord(Memory memory, Persistence persistence) {
         super(memory, persistence);
     }
