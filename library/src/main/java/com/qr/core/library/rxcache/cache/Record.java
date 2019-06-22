@@ -1,4 +1,4 @@
-package com.qr.core.library.rxcache.entity;
+package com.qr.core.library.rxcache.cache;
 
 import com.qr.core.library.rxcache.enums.Source;
 

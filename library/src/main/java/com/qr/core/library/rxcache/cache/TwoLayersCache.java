@@ -3,7 +3,6 @@ package com.qr.core.library.rxcache.cache;
 import com.qr.core.library.rxcache.cache.action.impl.EvictRecord;
 import com.qr.core.library.rxcache.cache.action.impl.RetrieveRecord;
 import com.qr.core.library.rxcache.cache.action.impl.SaveRecord;
-import com.qr.core.library.rxcache.entity.Record;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

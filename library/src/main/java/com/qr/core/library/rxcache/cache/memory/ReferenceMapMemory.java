@@ -1,7 +1,7 @@
 package com.qr.core.library.rxcache.cache.memory;
 
 import com.qr.core.library.rxcache.cache.memory.apache.ReferenceMap;
-import com.qr.core.library.rxcache.entity.Record;
+import com.qr.core.library.rxcache.cache.Record;
 
 import java.util.Collections;
 import java.util.Iterator;

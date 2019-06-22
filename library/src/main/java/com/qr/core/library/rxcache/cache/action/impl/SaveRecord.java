@@ -1,6 +1,6 @@
 package com.qr.core.library.rxcache.cache.action.impl;
 
-import com.qr.core.library.rxcache.entity.Record;
+import com.qr.core.library.rxcache.cache.Record;
 import com.qr.core.library.rxcache.cache.action.Action;
 import com.qr.core.library.rxcache.cache.memory.Memory;
 import com.qr.core.library.rxcache.cache.persistence.Persistence;

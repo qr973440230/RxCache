@@ -2,7 +2,7 @@ package com.qr.core.library.rxcache.cache.persistence;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.qr.core.library.rxcache.entity.Record;
+import com.qr.core.library.rxcache.cache.Record;
 
 import java.io.File;
 import java.io.FileInputStream;

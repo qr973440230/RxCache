@@ -26,6 +26,7 @@ public class ProxyProviders implements InvocationHandler {
             @Override
             public ObservableSource<?> call() throws Exception {
                 Observable<Object> observable = processorProviders.process(method,args);
+
                 Class<?> returnType = method.getReturnType();
                 if(returnType == Observable.class){
                     return Observable.just(observable);
@@ -39,7 +40,8 @@ public class ProxyProviders implements InvocationHandler {
                 if(returnType == Flowable.class){
                     return Observable.just(observable.toFlowable(BackpressureStrategy.MISSING));
                 }
-                String errorMsg = method.getName() + "无效的返回值类型";
+
+                String errorMsg = method.getName() + ": 无效的返回值类型!!!";
                 throw new RuntimeException(errorMsg);
             }
         }).blockingFirst();

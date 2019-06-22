@@ -1,6 +1,8 @@
 package com.qr.core.library.rxcache.processor;
 
 import com.qr.core.library.rxcache.cache.TwoLayersCache;
+import com.qr.core.library.rxcache.configuration.ConfigureProviders;
+import com.qr.core.library.rxcache.configuration.Configure;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -14,10 +16,12 @@ import io.reactivex.ObservableSource;
 @Singleton
 public final class ProcessorProvidersBehaviour implements ProcessorProviders {
     private final TwoLayersCache twoLayersCache;
+    private final ConfigureProviders configureProviders;
 
     @Inject
-    public ProcessorProvidersBehaviour(TwoLayersCache twoLayersCache) {
+    public ProcessorProvidersBehaviour(TwoLayersCache twoLayersCache, ConfigureProviders configureProviders) {
         this.twoLayersCache = twoLayersCache;
+        this.configureProviders = configureProviders;
     }
 
     @Override
@@ -25,9 +29,10 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
         return Observable.defer(new Callable<ObservableSource<? extends T>>() {
             @Override
             public ObservableSource<? extends T> call() throws Exception {
+                Configure configure = configureProviders.process(method, args);
                 // TODO: 根据函数配置进行缓存逻辑
 
-                return (ObservableSource<? extends T>) args[0];
+                return null;
             }
         });
     }

@@ -1,6 +1,6 @@
 package com.qr.core.library.rxcache.cache.persistence;
 
-import com.qr.core.library.rxcache.entity.Record;
+import com.qr.core.library.rxcache.cache.Record;
 
 import java.util.List;
 
