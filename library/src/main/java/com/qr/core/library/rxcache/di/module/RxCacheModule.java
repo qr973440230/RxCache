@@ -20,13 +20,20 @@ import javax.inject.Singleton;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Observable;
 
 @Module
 public abstract class RxCacheModule {
-    // 缓存配置
+    // Method Configure 缓存
     @Singleton
     @Provides
     static Map<Method, Configure> methodConfigureMap(){
+        return new HashMap<>();
+    }
+    // Method Loader 缓存
+    @Singleton
+    @Provides
+    static Map<Method, Observable> methodObservableMap(){
         return new HashMap<>();
     }
     // 内存

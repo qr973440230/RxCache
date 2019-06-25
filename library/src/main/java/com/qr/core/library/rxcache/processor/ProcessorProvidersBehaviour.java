@@ -1,8 +1,8 @@
 package com.qr.core.library.rxcache.processor;
 
 import com.qr.core.library.rxcache.cache.TwoLayersCache;
-import com.qr.core.library.rxcache.configuration.ConfigureProviders;
 import com.qr.core.library.rxcache.configuration.Configure;
+import com.qr.core.library.rxcache.configuration.ConfigureProviders;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -30,9 +30,9 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
             @Override
             public ObservableSource<? extends T> call() throws Exception {
                 Configure configure = configureProviders.process(method, args);
-                // TODO: 根据函数配置进行缓存逻辑
+                Observable<T> loaderObservable = configure.getLoaderObservable();
 
-                return null;
+                return loaderObservable;
             }
         });
     }

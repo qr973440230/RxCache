@@ -1,5 +1,8 @@
 package com.qr.core.library.rxcache;
 
+import com.alibaba.fastjson.JSON;
+import com.qr.core.library.rxcache.cache.Record;
+
 import org.junit.Test;
 
 import java.io.File;
@@ -26,6 +29,19 @@ public class ExampleUnitTest {
                 .subscribe(integer -> {
                     System.out.println(integer);
                 });
+
+        rxCache.using(Testsss.class)
+                .getObservableString(Observable.just("123","234","345"))
+                .subscribe(s -> {
+                   System.out.println(s);
+                });
+
+        rxCache.using(Testsss.class)
+                .getObservableRecord(Observable.just(new Record<Record>(new Record(1,200L),200),new Record<Record>(new Record(2,300L),200)))
+                .subscribe(recordRecord-> {
+                    System.out.println(JSON.toJSONString(recordRecord));
+                });
+
 
     }
 }
