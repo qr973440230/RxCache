@@ -28,7 +28,17 @@ public class ExampleUnitTest {
                 .setCacheDirectory(new File("D://"))
                 .build();
 
-
+        User user = new User();
+        user.password = "345";
+        user.username = "567";
+        rxCache.using(UserCache.class)
+                .userCache(Observable.just(user))
+                .subscribe(user1 -> {
+                    System.out.println(user1.password);
+                    System.out.println(user1.username);
+                },throwable -> {
+                    System.out.println(throwable.getMessage());
+                });
 
     }
 }

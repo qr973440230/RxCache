@@ -21,12 +21,12 @@ public class ReferenceMapMemory implements Memory {
     }
 
     @Override
-    public <T> Record<T> get(String key) {
+    public Record get(String key) {
         return recordReferenceMap.get(key);
     }
 
     @Override
-    public <T> void put(String key, Record<T> record) {
+    public void put(String key, Record record) {
         recordReferenceMap.put(key,record);
     }
 

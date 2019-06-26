@@ -8,9 +8,9 @@ public class Configure {
     private final String dynamicGroupKey;
     private final int    cacheStrategy;
     private final long    survivalTime;
-    private final Observable loaderObservable;
+    private final Observable<Object> loaderObservable;
 
-    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable loaderObservable) {
+    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<Object> loaderObservable) {
         this.providerKey = providerKey;
         this.dynamicKey = dynamicKey;
         this.dynamicGroupKey = dynamicGroupKey;
@@ -35,7 +35,7 @@ public class Configure {
         return cacheStrategy;
     }
 
-    public Observable getLoaderObservable() {
+    public Observable<Object> getLoaderObservable() {
         return loaderObservable;
     }
 

@@ -1,45 +1,27 @@
 package com.qr.core.library.rxcache.cache;
 
-import com.qr.core.library.rxcache.enums.Source;
-
-public final class Record <T>{
-    // 数据源
-    private Source source;
+public final class Record {
     // 数据
-    private final T data;
+    private final Object data;
     // 存活时间
     private long survivalTime;
     // 保存时的时间
     private final long persistedTime;
 
-    public Record(T data,long survivalTime){
+    public Record(Object data, long survivalTime){
         this.data = data;
         this.survivalTime = survivalTime;
         this.persistedTime = System.currentTimeMillis();
-        this.source = Source.MEMORY;
+
     }
 
-    public Source getSource() {
-        return source;
-    }
-
-    public T getData() {
+    public Object getData() {
         return data;
     }
-
     public long getPersistedTime() {
         return persistedTime;
     }
-
     public long getSurvivalTime() {
         return survivalTime;
-    }
-
-    public void setSource(Source source) {
-        this.source = source;
-    }
-
-    public void setSurvivalTime(long survivalTime) {
-        this.survivalTime = survivalTime;
     }
 }

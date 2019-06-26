@@ -23,7 +23,7 @@ public final class TwoLayersCache {
                      final Object data,final long survivalTime){
         saveRecord.save(providerKey,dynamicKey,dynamicGroupKey,data,survivalTime);
     }
-    public <T> Record<T> retrieve(final String providerKey, final String dynamicKey, final String dynamicGroupKey){
+    public Record retrieve(final String providerKey, final String dynamicKey, final String dynamicGroupKey){
         return retrieveRecord.retrieveRecord(providerKey,dynamicKey,dynamicGroupKey);
     }
     public void evictProviderKey(String providerKey){

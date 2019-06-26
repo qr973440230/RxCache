@@ -26,7 +26,7 @@ public class DiskPersistence implements Persistence {
     }
 
     @Override
-    public <T> void saveRecord(String key, Record<T> record) {
+    public void saveRecord(String key, Record record) {
         key = safetyKey(key);
         String jsonString = JSON.toJSONString(record);
 
@@ -103,12 +103,12 @@ public class DiskPersistence implements Persistence {
     }
 
     @Override
-    public <T> Record<T> retrieveRecord(String key) {
+    public Record retrieveRecord(String key) {
         key = safetyKey(key);
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(key);
-            return JSON.parseObject(inputStream,new TypeReference<Record<T>>(){}.getType());
+            inputStream = new FileInputStream(new File(cacheDirectory,key));
+            return JSON.parseObject(inputStream, Record.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }finally {

@@ -5,5 +5,5 @@ import java.lang.reflect.Method;
 import io.reactivex.Observable;
 
 public interface ProcessorProviders {
-    <T> Observable<T> process(final Method method,final Object[] args);
+    Observable<Object> process(final Method method,final Object[] args);
 }

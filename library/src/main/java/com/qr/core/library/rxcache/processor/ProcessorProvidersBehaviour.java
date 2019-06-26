@@ -27,61 +27,82 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
     }
 
     @Override
-    public <T> Observable<T> process(Method method, Object[] args) {
-        return Observable.defer(new Callable<ObservableSource<? extends T>>() {
+    public Observable<Object> process(Method method, Object[] args) {
+        return Observable.defer(new Callable<ObservableSource<Object>>() {
             @Override
-            public ObservableSource<? extends T> call() throws Exception {
+            public ObservableSource<Object> call() throws Exception {
                 Configure configure = configureProviders.process(method, args);
-                Observable<T> loaderObservable = configure.getLoaderObservable();
+                Observable<Object> loaderObservable = configure.getLoaderObservable();
                 return getCacheObservable(configure,loaderObservable);
             }
         });
     }
 
-    public <T> Observable<T> getCacheObservable(Configure configure,Observable<T> loaderObservable){
+    public Observable<Object> getCacheObservable(Configure configure,Observable<Object> loaderObservable){
         if(configure.getCacheStrategy() == OnCacheStrategy.Default){
             return Observable.create(emitter -> {
-                Record<T> retrieve = twoLayersCache.<T>retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey());
+                Record retrieve = twoLayersCache.retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey());
                 if(retrieve != null){
                     emitter.onNext(retrieve.getData());
                 }
 
-                T t = loaderObservable.blockingFirst();
-                twoLayersCache.save(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey(),t,configure.getSurvivalTime());
-                emitter.onNext(t);
+                Object o = loaderObservable.blockingFirst();
+                twoLayersCache.save(configure.getProviderKey(),
+                        configure.getDynamicKey(),
+                        configure.getDynamicGroupKey(),
+                        o,
+                        configure.getSurvivalTime());
+                emitter.onNext(o);
                 emitter.onComplete();
             });
         }else if(configure.getCacheStrategy() == OnCacheStrategy.NetworkPriority){
             return loaderObservable
-                    .doOnNext(t -> {
-                        twoLayersCache.save(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey(),t,configure.getSurvivalTime());
+                    .doOnNext(o -> {
+                        twoLayersCache.save(configure.getProviderKey(),
+                                configure.getDynamicKey(),
+                                configure.getDynamicGroupKey(),
+                                o,
+                                configure.getSurvivalTime());
                     })
                     .onErrorResumeNext(throwable -> {
-                        Record<T> retrieve = twoLayersCache.<T>retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey());
+                        Record retrieve = twoLayersCache.retrieve(configure.getProviderKey(),
+                                configure.getDynamicKey(),
+                                configure.getDynamicGroupKey());
                         if(retrieve != null){
                             return Observable.just(retrieve.getData());
                         }
-                        return Observable.<T>error(throwable);
+                        return Observable.error(throwable);
                     });
         }else if(configure.getCacheStrategy() == OnCacheStrategy.CachePriority){
-            return Observable.fromCallable(new Callable<T>() {
+            return Observable.fromCallable(new Callable<Object>() {
                 @Override
-                public T call() throws Exception {
-                    return twoLayersCache.<T>retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey()).getData();
+                public Object call() throws Exception {
+                    return twoLayersCache.retrieve(configure.getProviderKey(),
+                            configure.getDynamicKey(),
+                            configure.getDynamicGroupKey()).getData();
                 }
-            }).onErrorResumeNext(loaderObservable.doOnNext(t -> {
-                twoLayersCache.save(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey(),t,configure.getSurvivalTime());
+            }).onErrorResumeNext(loaderObservable.doOnNext(o -> {
+                twoLayersCache.save(configure.getProviderKey(),
+                        configure.getDynamicKey(),
+                        configure.getDynamicGroupKey(),
+                        o,
+                        configure.getSurvivalTime());
             }));
         }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyNetwork){
-            return loaderObservable.doOnNext(t -> {
-                twoLayersCache.save(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey(),t,configure.getSurvivalTime());
+            return loaderObservable.doOnNext(o -> {
+                twoLayersCache.save(configure.getProviderKey(),
+                        configure.getDynamicKey(),
+                        configure.getDynamicGroupKey(),
+                        o,
+                        configure.getSurvivalTime());
             });
         }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyCache){
-            return Observable.fromCallable(new Callable<T>() {
-                @Override
-                public T call() throws Exception {
-                    return twoLayersCache.<T>retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey()).getData();
-                }
+            return Observable.create(emitter -> {
+                Record retrieve = twoLayersCache.retrieve(configure.getProviderKey(),
+                        configure.getDynamicKey(),
+                        configure.getDynamicGroupKey());
+                emitter.onNext(retrieve.getData());
+                emitter.onComplete();
             });
         }
 

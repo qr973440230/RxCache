@@ -9,8 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CacheProvider {
     String providerKey();
-    String dynamicKey() default "";
-    String dynamicGroupKey() default "";
     long survivalTime() default 0;
     @OnCacheStrategy
     int onCacheStrategy() default OnCacheStrategy.Default;
