@@ -22,5 +22,4 @@ public class SaveRecord extends Action {
         memory.put(composeKey,record);
         persistence.saveRecord(composeKey,record);
     }
-
 }

@@ -11,6 +11,7 @@ public @interface CacheProvider {
     String providerKey();
     String dynamicKey() default "";
     String dynamicGroupKey() default "";
+    long survivalTime() default 0;
     @OnCacheStrategy
     int onCacheStrategy() default OnCacheStrategy.Default;
 }

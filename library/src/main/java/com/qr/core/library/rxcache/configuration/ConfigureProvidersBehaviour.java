@@ -33,10 +33,10 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
                 CacheProvider annotation = method.getAnnotation(CacheProvider.class);
                 if(annotation == null){
                     result = new Configure(method.getName(),"","",
-                            OnCacheStrategy.Default, getLoaderObservable(method,args));
+                            OnCacheStrategy.Default, 0, getLoaderObservable(method,args));
                 }else{
                     result = new Configure(annotation.providerKey(),annotation.dynamicKey(),annotation.dynamicGroupKey(),
-                            annotation.onCacheStrategy(), getLoaderObservable(method,args));
+                            annotation.onCacheStrategy(), annotation.survivalTime(), getLoaderObservable(method,args));
                 }
                 configureMap.put(method,result);
             }

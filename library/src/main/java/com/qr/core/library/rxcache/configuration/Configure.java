@@ -7,13 +7,15 @@ public class Configure {
     private final String dynamicKey;
     private final String dynamicGroupKey;
     private final int    cacheStrategy;
+    private final long    survivalTime;
     private final Observable loaderObservable;
 
-    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, Observable loaderObservable) {
+    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable loaderObservable) {
         this.providerKey = providerKey;
         this.dynamicKey = dynamicKey;
         this.dynamicGroupKey = dynamicGroupKey;
         this.cacheStrategy = cacheStrategy;
+        this.survivalTime = survivalTime;
         this.loaderObservable = loaderObservable;
     }
 
@@ -35,5 +37,9 @@ public class Configure {
 
     public Observable getLoaderObservable() {
         return loaderObservable;
+    }
+
+    public long getSurvivalTime() {
+        return survivalTime;
     }
 }

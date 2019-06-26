@@ -1,12 +1,17 @@
 package com.qr.core.library.rxcache;
 
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+
 import com.alibaba.fastjson.JSON;
 import com.qr.core.library.rxcache.cache.Record;
 
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 import static org.junit.Assert.*;
@@ -18,29 +23,11 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+    public void addition_isCorrect() throws IOException {
         RxCache rxCache = new RxCache.Builder()
-                .setCacheDirectory(new File("D:\\"))
+                .setCacheDirectory(new File("D://"))
                 .build();
 
-        rxCache.using(Testsss.class)
-                .getObservable(Observable.just(1,2,3))
-                .subscribe(integer -> {
-                    System.out.println(integer);
-                });
-
-        rxCache.using(Testsss.class)
-                .getObservableString(Observable.just("123","234","345"))
-                .subscribe(s -> {
-                   System.out.println(s);
-                });
-
-        rxCache.using(Testsss.class)
-                .getObservableRecord(Observable.just(new Record<Record>(new Record(1,200L),200),new Record<Record>(new Record(2,300L),200)))
-                .subscribe(recordRecord-> {
-                    System.out.println(JSON.toJSONString(recordRecord));
-                });
 
 
     }
