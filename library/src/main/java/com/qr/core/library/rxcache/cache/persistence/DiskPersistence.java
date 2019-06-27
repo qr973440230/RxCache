@@ -2,6 +2,9 @@ package com.qr.core.library.rxcache.cache.persistence;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.util.IOUtils;
 import com.qr.core.library.rxcache.cache.Record;
 
 import java.io.File;
@@ -19,16 +22,17 @@ import javax.inject.Singleton;
 @Singleton
 public class DiskPersistence implements Persistence {
     private final File cacheDirectory;
-
+    private final ParserConfig parserConfig;
     @Inject
-    public DiskPersistence(File cacheDirectory) {
+    public DiskPersistence(File cacheDirectory, ParserConfig parserConfig) {
         this.cacheDirectory = cacheDirectory;
+        this.parserConfig = parserConfig;
     }
 
     @Override
     public void saveRecord(String key, Record record) {
         key = safetyKey(key);
-        String jsonString = JSON.toJSONString(record);
+        String jsonString = JSON.toJSONString(record, SerializerFeature.WriteClassName);
 
         FileWriter fileWriter = null;
         try {
@@ -103,12 +107,12 @@ public class DiskPersistence implements Persistence {
     }
 
     @Override
-    public Record retrieveRecord(String key) {
+    public <T> Record<T> retrieveRecord(String key) {
         key = safetyKey(key);
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(new File(cacheDirectory,key));
-            return JSON.parseObject(inputStream, Record.class);
+            return JSON.parseObject(inputStream, IOUtils.UTF8, new TypeReference<Record<T>>(){}.getType(),parserConfig);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }finally {

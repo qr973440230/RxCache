@@ -7,9 +7,8 @@ import com.qr.core.library.rxcache.annotation.CacheProvider;
 import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,14 +29,14 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
     }
 
     @Override
-    public Configure process(Method method, Object[] args) {
-        Configure result = null;
+    public <T> Configure<T> process(Method method, Object[] args) {
+        Configure<T> result = null;
         synchronized (configureMap){
             result = configureMap.get(method);
             if(result == null){
                 CacheProvider annotation = method.getAnnotation(CacheProvider.class);
-                Observable loaderObservable = getLoaderObservable(method, args);
                 DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
+                Observable<T> loaderObservable = getLoaderObservable(method, args);
                 if(annotation == null){
                     result = new Configure(method.getName(),
                             dynamicGroupKey.getDynamicKey().toString(),

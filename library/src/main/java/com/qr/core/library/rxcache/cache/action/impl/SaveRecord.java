@@ -15,8 +15,8 @@ public class SaveRecord extends Action {
         super(memory, persistence);
     }
 
-    public void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
-              final Object data,final long survivalTime){
+    public <T> void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
+              final T data,final long survivalTime){
         String composeKey = composeKey(providerKey, dynamicKey, dynamicGroupKey);
         Record record = new Record(data,survivalTime);
         memory.put(composeKey,record);

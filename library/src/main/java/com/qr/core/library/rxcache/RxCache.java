@@ -1,5 +1,6 @@
 package com.qr.core.library.rxcache;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.qr.core.library.rxcache.di.component.DaggerRxCacheComponent;
 import com.qr.core.library.rxcache.processor.ProcessorProviders;
 import com.qr.core.library.rxcache.proxy.ProxyProviders;

@@ -6,9 +6,9 @@ import java.util.Set;
 
 public interface Memory {
     // 从内存取出Record
-    Record get(String key);
+    <T> Record<T> get(String key);
     // 保存Record到内存
-    void put(String key,Record record);
+    <T> void put(String key,Record<T> record);
     // 获取Key集合
     Set<String> keySet();
     // 驱逐内存指定key数据

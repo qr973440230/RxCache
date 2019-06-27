@@ -19,11 +19,11 @@ public final class TwoLayersCache {
         this.retrieveRecord = retrieveRecord;
         this.evictRecord = evictRecord;
     }
-    public void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
-                     final Object data,final long survivalTime){
+    public <T> void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
+                     final T data,final long survivalTime){
         saveRecord.save(providerKey,dynamicKey,dynamicGroupKey,data,survivalTime);
     }
-    public Record retrieve(final String providerKey, final String dynamicKey, final String dynamicGroupKey){
+    public <T> Record<T> retrieve(final String providerKey, final String dynamicKey, final String dynamicGroupKey){
         return retrieveRecord.retrieveRecord(providerKey,dynamicKey,dynamicGroupKey);
     }
     public void evictProviderKey(String providerKey){

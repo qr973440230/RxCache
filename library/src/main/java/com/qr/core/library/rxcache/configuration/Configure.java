@@ -2,15 +2,15 @@ package com.qr.core.library.rxcache.configuration;
 
 import io.reactivex.Observable;
 
-public class Configure {
+public class Configure <T>{
     private final String providerKey;
     private final String dynamicKey;
     private final String dynamicGroupKey;
     private final int    cacheStrategy;
     private final long    survivalTime;
-    private final Observable<Object> loaderObservable;
+    private final Observable<T> loaderObservable;
 
-    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<Object> loaderObservable) {
+    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<T> loaderObservable) {
         this.providerKey = providerKey;
         this.dynamicKey = dynamicKey;
         this.dynamicGroupKey = dynamicGroupKey;
@@ -35,7 +35,7 @@ public class Configure {
         return cacheStrategy;
     }
 
-    public Observable<Object> getLoaderObservable() {
+    public Observable<T> getLoaderObservable() {
         return loaderObservable;
     }
 

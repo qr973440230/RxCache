@@ -16,7 +16,7 @@ public class RetrieveRecord extends Action {
         super(memory, persistence);
     }
 
-    public Record retrieveRecord(String providerKey,String dynamicKey,String dynamicGroupKey){
+    public <T> Record<T> retrieveRecord(String providerKey,String dynamicKey,String dynamicGroupKey){
         String composeKey = composeKey(providerKey, dynamicKey, dynamicGroupKey);
         Record record = memory.get(composeKey);
         if(record == null){

@@ -1,5 +1,6 @@
 package com.qr.core.library.rxcache.di.module;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.qr.core.library.rxcache.cache.memory.Memory;
 import com.qr.core.library.rxcache.cache.memory.ReferenceMapMemory;
 import com.qr.core.library.rxcache.cache.persistence.DiskPersistence;
@@ -35,6 +36,14 @@ public abstract class RxCacheModule {
     @Provides
     static Map<Method, Observable> methodObservableMap(){
         return new HashMap<>();
+    }
+    // RxCache使用的ParseConfig 使用自动类型支持
+    @Singleton
+    @Provides
+    static ParserConfig parserConfig(){
+        ParserConfig parserConfig = new ParserConfig();
+        parserConfig.setAutoTypeSupport(true);
+        return parserConfig;
     }
     // 内存
     @Binds
