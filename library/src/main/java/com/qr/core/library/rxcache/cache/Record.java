@@ -8,10 +8,10 @@ public final class Record<T>{
     // 保存时的时间
     private final long persistedTime;
 
-    public Record(T data, long survivalTime){
+    public Record(T data, long survivalTime,long persistedTime){
         this.data = data;
         this.survivalTime = survivalTime;
-        this.persistedTime = System.currentTimeMillis();
+        this.persistedTime = persistedTime;
     }
 
     public long getPersistedTime() {
@@ -20,7 +20,9 @@ public final class Record<T>{
     public long getSurvivalTime() {
         return survivalTime;
     }
-
+    public void setSurvivalTime(long survivalTime){
+        this.survivalTime = survivalTime;
+    }
     public T getData() {
         return data;
     }

@@ -49,7 +49,7 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
                             dynamicGroupKey.getDynamicKey().toString(),
                             dynamicGroupKey.getDynamicGroupKey().toString(),
                             annotation.onCacheStrategy(),
-                            annotation.survivalTime(),
+                            annotation.timeUnit().toMillis(annotation.survivalTime()),
                             loaderObservable);
                 }
             }
