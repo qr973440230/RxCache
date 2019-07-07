@@ -10,7 +10,7 @@ public class Configure <T>{
     private final long    survivalTime;
     private final Observable<T> loaderObservable;
 
-    public Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<T> loaderObservable) {
+    Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<T> loaderObservable) {
         this.providerKey = providerKey;
         this.dynamicKey = dynamicKey;
         this.dynamicGroupKey = dynamicGroupKey;

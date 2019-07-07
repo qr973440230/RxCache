@@ -3,12 +3,11 @@ package com.qr.core.library.rxcache.configuration;
 
 import com.qr.core.library.rxcache.DynamicGroupKey;
 import com.qr.core.library.rxcache.DynamicKey;
-import com.qr.core.library.rxcache.annotation.CacheProvider;
+import com.qr.core.library.rxcache.annotation.LifeCache;
+import com.qr.core.library.rxcache.annotation.ProviderKey;
 import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,24 +33,36 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
         synchronized (configureMap){
             result = configureMap.get(method);
             if(result == null){
-                CacheProvider annotation = method.getAnnotation(CacheProvider.class);
+                ProviderKey providerKey = method.getAnnotation(ProviderKey.class);
+                LifeCache lifeCache = method.getAnnotation(LifeCache.class);
                 DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
                 Observable<T> loaderObservable = getLoaderObservable(method, args);
-                if(annotation == null){
-                    result = new Configure(method.getName(),
-                            dynamicGroupKey.getDynamicKey().toString(),
-                            dynamicGroupKey.getDynamicGroupKey().toString(),
-                            OnCacheStrategy.Default,
-                            0,
-                            loaderObservable);
-                }else{
-                    result = new Configure(annotation.providerKey(),
-                            dynamicGroupKey.getDynamicKey().toString(),
-                            dynamicGroupKey.getDynamicGroupKey().toString(),
-                            annotation.onCacheStrategy(),
-                            annotation.timeUnit().toMillis(annotation.survivalTime()),
-                            loaderObservable);
+                String provider;
+                int cacheStrategy;
+                if(providerKey == null){
+                    provider = method.getName();
+                    cacheStrategy = OnCacheStrategy.Default;
                 }
+                else{
+                    provider = providerKey.providerKey();
+                    cacheStrategy = providerKey.onCacheStrategy();
+                }
+
+                long survivalTime;
+                if(lifeCache == null){
+                    survivalTime = 0;
+                }else{
+                    survivalTime = lifeCache.timeUnit().toMillis(lifeCache.survivalTime());
+                }
+
+                result = new Configure<T>(provider,
+                        dynamicGroupKey.getDynamicKey().toString(),
+                        dynamicGroupKey.getDynamicGroupKey().toString(),
+                        cacheStrategy,
+                        survivalTime,
+                        loaderObservable);
+
+                configureMap.put(method,result);
             }
         }
         return result;

@@ -1,6 +1,6 @@
 package com.qr.core.library.rxcache.annotation;
 
-import android.support.annotation.IntDef;
+
 
 import java.lang.annotation.Retention;
 

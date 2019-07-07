@@ -8,10 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CacheProvider {
-    String providerKey();
-    long survivalTime() default 0;
+public @interface LifeCache {
+    long survivalTime();
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
-    @OnCacheStrategy
-    int onCacheStrategy() default OnCacheStrategy.Default;
 }

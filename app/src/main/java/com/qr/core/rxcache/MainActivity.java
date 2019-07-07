@@ -1,5 +1,6 @@
 package com.qr.core.rxcache;
 
+import android.support.annotation.IntDef;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 

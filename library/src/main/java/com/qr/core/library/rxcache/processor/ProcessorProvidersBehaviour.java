@@ -130,11 +130,14 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 // 重新设置过期时间 防止接口更改时间后 数据可能不过期的情况
                 retrieve.setSurvivalTime(configure.getSurvivalTime());
 
-                if(retrieve.getPersistedTime() + retrieve.getSurvivalTime() < System.currentTimeMillis()){
-                    throw new CacheExpirationException(String.format("RxCache: 缓存过期!!! ProviderKey: %s DynamicKey: %s DynamicGroupKey: %s",
-                            configure.getProviderKey(),
-                            configure.getDynamicKey(),
-                            configure.getDynamicGroupKey()));
+                // survivalTime <= 0 为永久保存
+                if(retrieve.getSurvivalTime() > 0){
+                    if(retrieve.getPersistedTime() + retrieve.getSurvivalTime() < System.currentTimeMillis()){
+                        throw new CacheExpirationException(String.format("RxCache: 缓存过期!!! ProviderKey: %s DynamicKey: %s DynamicGroupKey: %s",
+                                configure.getProviderKey(),
+                                configure.getDynamicKey(),
+                                configure.getDynamicGroupKey()));
+                    }
                 }
 
                 return retrieve.getData();
