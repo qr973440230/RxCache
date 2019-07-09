@@ -4,19 +4,16 @@ import io.reactivex.Observable;
 
 public class Configure <T>{
     private final String providerKey;
-    private final String dynamicKey;
-    private final String dynamicGroupKey;
+    Observable<T> loaderObservable;
+    String dynamicKey;
+    String dynamicGroupKey;
     private final int    cacheStrategy;
     private final long    survivalTime;
-    private final Observable<T> loaderObservable;
 
-    Configure(String providerKey, String dynamicKey, String dynamicGroupKey, int cacheStrategy, long survivalTime, Observable<T> loaderObservable) {
+    Configure(String providerKey,int cacheStrategy, long survivalTime) {
         this.providerKey = providerKey;
-        this.dynamicKey = dynamicKey;
-        this.dynamicGroupKey = dynamicGroupKey;
         this.cacheStrategy = cacheStrategy;
         this.survivalTime = survivalTime;
-        this.loaderObservable = loaderObservable;
     }
 
     public String getProviderKey() {

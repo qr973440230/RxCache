@@ -29,14 +29,12 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
 
     @Override
     public <T> Configure<T> process(Method method, Object[] args) {
-        Configure<T> result = null;
+        Configure<T> result;
         synchronized (configureMap){
             result = configureMap.get(method);
             if(result == null){
                 ProviderKey providerKey = method.getAnnotation(ProviderKey.class);
                 LifeCache lifeCache = method.getAnnotation(LifeCache.class);
-                DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
-                Observable<T> loaderObservable = getLoaderObservable(method, args);
                 String provider;
                 int cacheStrategy;
                 if(providerKey == null){
@@ -56,15 +54,18 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
                 }
 
                 result = new Configure<T>(provider,
-                        dynamicGroupKey.getDynamicKey().toString(),
-                        dynamicGroupKey.getDynamicGroupKey().toString(),
                         cacheStrategy,
-                        survivalTime,
-                        loaderObservable);
+                        survivalTime);
 
                 configureMap.put(method,result);
             }
+
+            result.loaderObservable = getLoaderObservable(method, args);
+            DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
+            result.dynamicKey = dynamicGroupKey.getDynamicKey().toString();
+            result.dynamicGroupKey = dynamicGroupKey.getDynamicGroupKey().toString();
         }
+
         return result;
     }
 
