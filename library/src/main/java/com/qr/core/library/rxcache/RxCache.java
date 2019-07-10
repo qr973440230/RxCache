@@ -1,6 +1,5 @@
 package com.qr.core.library.rxcache;
 
-import com.alibaba.fastjson.parser.ParserConfig;
 import com.qr.core.library.rxcache.di.component.DaggerRxCacheComponent;
 import com.qr.core.library.rxcache.processor.ProcessorProviders;
 import com.qr.core.library.rxcache.proxy.ProxyProviders;
@@ -25,6 +24,10 @@ public class RxCache {
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
                 new Class[]{clazz},
                 new ProxyProviders(processorProviders));
+    }
+
+    public void evictAll(){
+        processorProviders.evictAll();
     }
 
     public static class Builder{

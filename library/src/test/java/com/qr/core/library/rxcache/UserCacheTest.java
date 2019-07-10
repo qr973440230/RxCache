@@ -19,14 +19,17 @@ import static org.junit.Assert.*;
 public class UserCacheTest {
     Map<String,User> userMap;
     RxCache rxCache;
+    UserCache using;
+    User user;
 
     @Before
     public void setUp() throws Exception {
         rxCache = new RxCache.Builder()
-                .setCacheDirectory(new File("D://"))
+                .setCacheDirectory(new File("D://RxCache//"))
                 .build();
+        using = rxCache.using(UserCache.class);
 
-        User user = new User();
+        user = new User();
         user.password = "122";
         user.username = "23432";
         userMap = new HashMap<>();
@@ -143,6 +146,23 @@ public class UserCacheTest {
                     System.out.println(JSON.toJSONString(stringUserMap));
                 },throwable -> {
                     System.out.println(throwable.getMessage());
+                });
+    }
+
+    @Test
+    public void testDynamicKey(){
+        Observable.range(1,100)
+                .flatMap(integer -> {
+                    return Observable.range(100,100);
+                })
+                .flatMap(integer -> {
+                    user.username = integer + "";
+                    return using.observable(Observable.just(user),new DynamicKey(user.username));
+                })
+                .subscribe(user1 -> {
+                    System.out.println(user1);
+                },throwable -> {
+
                 });
     }
 

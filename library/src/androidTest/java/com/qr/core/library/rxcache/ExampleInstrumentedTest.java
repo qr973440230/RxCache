@@ -1,11 +1,18 @@
 package com.qr.core.library.rxcache;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.File;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 import static org.junit.Assert.*;
 
@@ -17,10 +24,24 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
-    public void useAppContext() {
+    public void useAppContext() throws InterruptedException {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"RxCache");
+        file.mkdir();
+        RxCache rxCache = new RxCache.Builder().setCacheDirectory(file).build();
+        Observable.range(1,100)
+                .observeOn(Schedulers.io())
+                .flatMap(integer -> {
+                    return rxCache.using(UserCache.class)
+                            .observable(Observable.just(new User()),new DynamicKey(integer));
+                })
+                .subscribe(user -> {
+                    Log.d("user",user.toString());
+                },throwable -> {
+                    Log.d("user",throwable.getMessage());
+                });
 
-        assertEquals("com.qr.core.library.rxcache.test", appContext.getPackageName());
+        Thread.sleep(100000);
     }
 }

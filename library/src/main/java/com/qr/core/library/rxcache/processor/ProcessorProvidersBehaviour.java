@@ -39,6 +39,11 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
         });
     }
 
+    @Override
+    public void evictAll() {
+        twoLayersCache.evictAll();
+    }
+
     public <T> Observable<T> getCacheObservable(Configure<T> configure){
         if(configure.getCacheStrategy() == OnCacheStrategy.Default){
             // 先缓存后数据
@@ -52,21 +57,23 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 return null;
             }).toObservable();
             return Observable.concatArrayEagerDelayError(localObservable,
-                    configure.getLoaderObservable().doOnNext(t -> {
+                    configure.getLoaderObservable().map(t -> {
                         twoLayersCache.save(configure.getProviderKey(),
                                 configure.getDynamicKey(),
                                 configure.getDynamicGroupKey(),
                                 t,
                                 configure.getSurvivalTime());
+                        return t;
                     }));
         }else if(configure.getCacheStrategy() == OnCacheStrategy.NetworkPriority){
             return configure.getLoaderObservable()
-                    .doOnNext(t -> {
+                    .map(t -> {
                         twoLayersCache.save(configure.getProviderKey(),
                                 configure.getDynamicKey(),
                                 configure.getDynamicGroupKey(),
                                 t,
                                 configure.getSurvivalTime());
+                        return t;
                     })
                     .onErrorResumeNext(throwable -> {
                         Record<T> record = twoLayersCache.retrieve(configure.getProviderKey(),
@@ -89,20 +96,22 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                     throw new NoSuchElementException();
                 }
                 return record.getData();
-            }).onErrorResumeNext(configure.getLoaderObservable().doOnNext(t -> {
+            }).onErrorResumeNext(configure.getLoaderObservable().map(t -> {
                 twoLayersCache.save(configure.getProviderKey(),
                         configure.getDynamicKey(),
                         configure.getDynamicGroupKey(),
                         t,
                         configure.getSurvivalTime());
+                return t;
             }));
         }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyNetwork){
-            return configure.getLoaderObservable().doOnNext(t -> {
+            return configure.getLoaderObservable().map(t -> {
                 twoLayersCache.save(configure.getProviderKey(),
                         configure.getDynamicKey(),
                         configure.getDynamicGroupKey(),
                         t,
                         configure.getSurvivalTime());
+                return t;
             });
         }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyCache){
             return Observable.fromCallable(() -> {
@@ -118,6 +127,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 return retrieve.getData();
             });
         }else if(configure.getCacheStrategy() == OnCacheStrategy.CacheControl){
+
             return Observable.fromCallable(()->{
                 Record<T> retrieve = twoLayersCache.retrieve(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey());
                 if(retrieve == null){
@@ -126,6 +136,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                             configure.getDynamicKey(),
                             configure.getDynamicGroupKey()));
                 }
+
 
                 // 重新设置过期时间 防止接口更改时间后 数据可能不过期的情况
                 retrieve.setSurvivalTime(configure.getSurvivalTime());
@@ -141,12 +152,13 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 }
 
                 return retrieve.getData();
-            }).onErrorResumeNext(configure.getLoaderObservable().doOnNext(t -> {
+            }).onErrorResumeNext(configure.getLoaderObservable().map(t -> {
                 twoLayersCache.save(configure.getProviderKey(),
                         configure.getDynamicKey(),
                         configure.getDynamicGroupKey(),
                         t,
                         configure.getSurvivalTime());
+                return t;
             }));
         }
 

@@ -6,4 +6,5 @@ import io.reactivex.Observable;
 
 public interface ProcessorProviders {
     <T> Observable<T> process(final Method method,final Object[] args);
+    void evictAll();
 }
