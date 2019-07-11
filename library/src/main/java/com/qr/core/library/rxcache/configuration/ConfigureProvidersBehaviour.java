@@ -29,6 +29,16 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
 
     @Override
     public <T> Configure<T> process(Method method, Object[] args) {
+        Configure<T> cacheConfigure = getCacheConfigure(method, args);
+        Configure<T> configure = new Configure<>(cacheConfigure.getProviderKey(),cacheConfigure.getCacheStrategy(),cacheConfigure.getSurvivalTime());
+        DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
+        configure.loaderObservable = getLoaderObservable(method,args);
+        configure.dynamicGroupKey = dynamicGroupKey.getDynamicGroupKey().toString();
+        configure.dynamicKey = dynamicGroupKey.getDynamicKey().toString();
+        return configure;
+    }
+
+    private <T> Configure<T> getCacheConfigure(Method method,Object[] args){
         Configure<T> result;
         synchronized (configureMap){
             result = configureMap.get(method);
@@ -59,13 +69,7 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
 
                 configureMap.put(method,result);
             }
-
-            result.loaderObservable = getLoaderObservable(method, args);
-            DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
-            result.dynamicKey = dynamicGroupKey.getDynamicKey().toString();
-            result.dynamicGroupKey = dynamicGroupKey.getDynamicGroupKey().toString();
         }
-
         return result;
     }
 
