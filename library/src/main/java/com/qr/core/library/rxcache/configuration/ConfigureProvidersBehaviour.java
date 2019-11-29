@@ -3,6 +3,7 @@ package com.qr.core.library.rxcache.configuration;
 
 import com.qr.core.library.rxcache.DynamicGroupKey;
 import com.qr.core.library.rxcache.DynamicKey;
+import com.qr.core.library.rxcache.EvictKey;
 import com.qr.core.library.rxcache.annotation.LifeCache;
 import com.qr.core.library.rxcache.annotation.ProviderKey;
 import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
@@ -30,36 +31,37 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
     @Override
     public <T> Configure<T> process(Method method, Object[] args) {
         Configure<T> cacheConfigure = getCacheConfigure(method, args);
-        Configure<T> configure = new Configure<>(cacheConfigure.getProviderKey(),cacheConfigure.getCacheStrategy(),cacheConfigure.getSurvivalTime());
+        Configure<T> configure = new Configure<>(cacheConfigure.getProviderKey(), cacheConfigure.getCacheStrategy(), cacheConfigure.getSurvivalTime());
         DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
-        configure.loaderObservable = getLoaderObservable(method,args);
+        EvictKey evictKey = getEvictKey(method, args);
+        configure.loaderObservable = getLoaderObservable(method, args);
         configure.dynamicGroupKey = dynamicGroupKey.getDynamicGroupKey().toString();
         configure.dynamicKey = dynamicGroupKey.getDynamicKey().toString();
+        configure.evict = evictKey.isEvict();
         return configure;
     }
 
-    private <T> Configure<T> getCacheConfigure(Method method,Object[] args){
+    private <T> Configure<T> getCacheConfigure(Method method, Object[] args) {
         Configure<T> result;
-        synchronized (configureMap){
+        synchronized (configureMap) {
             result = configureMap.get(method);
-            if(result == null){
+            if (result == null) {
                 ProviderKey providerKey = method.getAnnotation(ProviderKey.class);
                 LifeCache lifeCache = method.getAnnotation(LifeCache.class);
                 String provider;
                 int cacheStrategy;
-                if(providerKey == null){
+                if (providerKey == null) {
                     provider = method.getName();
                     cacheStrategy = OnCacheStrategy.Default;
-                }
-                else{
+                } else {
                     provider = providerKey.providerKey();
                     cacheStrategy = providerKey.onCacheStrategy();
                 }
 
                 long survivalTime;
-                if(lifeCache == null){
+                if (lifeCache == null) {
                     survivalTime = 0;
-                }else{
+                } else {
                     survivalTime = lifeCache.timeUnit().toMillis(lifeCache.survivalTime());
                 }
 
@@ -67,27 +69,36 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
                         cacheStrategy,
                         survivalTime);
 
-                configureMap.put(method,result);
+                configureMap.put(method, result);
             }
         }
         return result;
     }
 
-    private DynamicGroupKey getDynamicGroupKey(Method method,Object[] args){
+    private EvictKey getEvictKey(Method method, Object[] args) {
+        EvictKey evictKey = getObjectFromMethodParam(method, args, EvictKey.class);
+        if (evictKey == null) {
+            return new EvictKey(false);
+        }
+
+        return evictKey;
+    }
+
+    private DynamicGroupKey getDynamicGroupKey(Method method, Object[] args) {
         DynamicGroupKey dynamicGroupKey = getObjectFromMethodParam(method, args, DynamicGroupKey.class);
-        if(dynamicGroupKey != null){
+        if (dynamicGroupKey != null) {
             return dynamicGroupKey;
         }
 
         DynamicKey dynamicKey = getObjectFromMethodParam(method, args, DynamicKey.class);
-        if(dynamicKey != null){
-            return new DynamicGroupKey(dynamicKey.getDynamicKey(),"");
+        if (dynamicKey != null) {
+            return new DynamicGroupKey(dynamicKey.getDynamicKey(), "");
         }
 
-        return new DynamicGroupKey("","");
+        return new DynamicGroupKey("", "");
     }
 
-    private <T> Observable<T> getLoaderObservable(Method method,Object[] args){
+    private <T> Observable<T> getLoaderObservable(Method method, Object[] args) {
         Observable<T> observable = getObjectFromMethodParam(method, args, Observable.class);
         if (observable != null) return observable;
 
@@ -103,7 +114,7 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
         throw new IllegalArgumentException(method.getName() + "参数错误!!! 未找到: observable、 single、maybe、flowable");
     }
 
-    private <T> T getObjectFromMethodParam(Method method, Object[] args,Class<T> expectedClass) {
+    private <T> T getObjectFromMethodParam(Method method, Object[] args, Class<T> expectedClass) {
         int countSameObjectsType = 0;
         T expectedObject = null;
 

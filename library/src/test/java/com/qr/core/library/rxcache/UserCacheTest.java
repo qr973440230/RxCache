@@ -17,7 +17,7 @@ import io.reactivex.Observable;
 import static org.junit.Assert.*;
 
 public class UserCacheTest {
-    Map<String,User> userMap;
+    Map<String, User> userMap;
     RxCache rxCache;
     UserCache using;
     User user;
@@ -33,16 +33,16 @@ public class UserCacheTest {
         user.password = "122";
         user.username = "23432";
         userMap = new HashMap<>();
-        userMap.put("ass",user);
+        userMap.put("ass", user);
     }
 
     @Test
-    public void testDefault(){
+    public void testDefault() {
         rxCache.using(UserCache.class)
                 .userMapDefault(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
 
@@ -50,18 +50,18 @@ public class UserCacheTest {
                 .userMapDefault(Observable.error(new Throwable("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testNetworkPriority(){
+    public void testNetworkPriority() {
         rxCache.using(UserCache.class)
                 .userMapNetworkPriority(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
 
@@ -69,36 +69,36 @@ public class UserCacheTest {
                 .userMapNetworkPriority(Observable.error(new Exception("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testCachePriority(){
+    public void testCachePriority() {
         rxCache.using(UserCache.class)
                 .userMapCachePriority(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
         rxCache.using(UserCache.class)
                 .userMapCachePriority(Observable.error(new Throwable("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testOnlyNetwork(){
+    public void testOnlyNetwork() {
         rxCache.using(UserCache.class)
                 .userMapOnlyNetwork(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
 
@@ -106,18 +106,18 @@ public class UserCacheTest {
                 .userMapOnlyNetwork(Observable.error(new Throwable("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testOnlyCache(){
+    public void testOnlyCache() {
         rxCache.using(UserCache.class)
                 .userMapOnlyCache(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
-                   System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                    System.out.println(JSON.toJSONString(stringUserMap));
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
 
@@ -125,18 +125,18 @@ public class UserCacheTest {
                 .userMapOnlyCache(Observable.error(new Throwable("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testCacheControl(){
+    public void testCacheControl() {
         rxCache.using(UserCache.class)
                 .userMapCacheControl(Observable.just(userMap))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
 
@@ -144,24 +144,24 @@ public class UserCacheTest {
                 .userMapCacheControl(Observable.error(new Throwable("123456")))
                 .subscribe(stringUserMap -> {
                     System.out.println(JSON.toJSONString(stringUserMap));
-                },throwable -> {
+                }, throwable -> {
                     System.out.println(throwable.getMessage());
                 });
     }
 
     @Test
-    public void testDynamicKey(){
-        Observable.range(1,100)
+    public void testDynamicKey() {
+        Observable.range(1, 100)
                 .flatMap(integer -> {
-                    return Observable.range(100,100);
+                    return Observable.range(100, 100);
                 })
                 .flatMap(integer -> {
                     user.username = integer + "";
-                    return using.observable(Observable.just(user),new DynamicKey(user.username));
+                    return using.observable(Observable.just(user), new DynamicKey(user.username));
                 })
                 .subscribe(user1 -> {
                     System.out.println(user1);
-                },throwable -> {
+                }, throwable -> {
 
                 });
     }

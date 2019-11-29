@@ -44,8 +44,15 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
         twoLayersCache.evictAll();
     }
 
-    public <T> Observable<T> getCacheObservable(Configure<T> configure){
-        if(configure.getCacheStrategy() == OnCacheStrategy.Default){
+    public <T> Observable<T> getCacheObservable(Configure<T> configure) {
+        if (configure.isEvict()) {
+            // 先清掉缓存
+            twoLayersCache.evictDynamicGroupKey(configure.getProviderKey(),
+                    configure.getDynamicKey(),
+                    configure.getDynamicGroupKey());
+        }
+
+        if (configure.getCacheStrategy() == OnCacheStrategy.Default) {
             // 先缓存后数据
             Observable<T> localObservable = Maybe.fromCallable(() -> {
                 Record<T> record = twoLayersCache.retrieve(configure.getProviderKey(),
@@ -54,6 +61,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 if (record != null) {
                     return record.getData();
                 }
+
                 return null;
             }).toObservable();
             return Observable.concatArrayEagerDelayError(localObservable,
@@ -65,7 +73,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                                 configure.getSurvivalTime());
                         return t;
                     }));
-        }else if(configure.getCacheStrategy() == OnCacheStrategy.NetworkPriority){
+        } else if (configure.getCacheStrategy() == OnCacheStrategy.NetworkPriority) {
             return configure.getLoaderObservable()
                     .map(t -> {
                         twoLayersCache.save(configure.getProviderKey(),
@@ -87,12 +95,12 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                         // 无缓存数据 返回loader错误信息
                         return Observable.error(throwable);
                     });
-        }else if(configure.getCacheStrategy() == OnCacheStrategy.CachePriority){
+        } else if (configure.getCacheStrategy() == OnCacheStrategy.CachePriority) {
             return Observable.fromCallable(() -> {
                 Record<T> record = twoLayersCache.retrieve(configure.getProviderKey(),
                         configure.getDynamicKey(),
                         configure.getDynamicGroupKey());
-                if(record == null){
+                if (record == null) {
                     throw new NoSuchElementException();
                 }
                 return record.getData();
@@ -104,7 +112,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                         configure.getSurvivalTime());
                 return t;
             }));
-        }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyNetwork){
+        } else if (configure.getCacheStrategy() == OnCacheStrategy.OnlyNetwork) {
             return configure.getLoaderObservable().map(t -> {
                 twoLayersCache.save(configure.getProviderKey(),
                         configure.getDynamicKey(),
@@ -113,12 +121,12 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                         configure.getSurvivalTime());
                 return t;
             });
-        }else if(configure.getCacheStrategy() == OnCacheStrategy.OnlyCache){
+        } else if (configure.getCacheStrategy() == OnCacheStrategy.OnlyCache) {
             return Observable.fromCallable(() -> {
                 Record<T> retrieve = twoLayersCache.retrieve(configure.getProviderKey(),
                         configure.getDynamicKey(),
                         configure.getDynamicGroupKey());
-                if(retrieve == null){
+                if (retrieve == null) {
                     throw new CacheNoSuchElementException(String.format("RxCache: 无数据!!! ProviderKey: %s DynamicKey: %s DynamicGroupKey: %s",
                             configure.getProviderKey(),
                             configure.getDynamicKey(),
@@ -126,24 +134,23 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 }
                 return retrieve.getData();
             });
-        }else if(configure.getCacheStrategy() == OnCacheStrategy.CacheControl){
+        } else if (configure.getCacheStrategy() == OnCacheStrategy.CacheControl) {
 
-            return Observable.fromCallable(()->{
-                Record<T> retrieve = twoLayersCache.retrieve(configure.getProviderKey(),configure.getDynamicKey(),configure.getDynamicGroupKey());
-                if(retrieve == null){
+            return Observable.fromCallable(() -> {
+                Record<T> retrieve = twoLayersCache.retrieve(configure.getProviderKey(), configure.getDynamicKey(), configure.getDynamicGroupKey());
+                if (retrieve == null) {
                     throw new CacheNoSuchElementException(String.format("RxCache: 无数据!!! ProviderKey: %s DynamicKey: %s DynamicGroupKey: %s",
                             configure.getProviderKey(),
                             configure.getDynamicKey(),
                             configure.getDynamicGroupKey()));
                 }
 
-
                 // 重新设置过期时间 防止接口更改时间后 数据可能不过期的情况
                 retrieve.setSurvivalTime(configure.getSurvivalTime());
 
                 // survivalTime <= 0 为永久保存
-                if(retrieve.getSurvivalTime() > 0){
-                    if(retrieve.getPersistedTime() + retrieve.getSurvivalTime() < System.currentTimeMillis()){
+                if (retrieve.getSurvivalTime() > 0) {
+                    if (retrieve.getPersistedTime() + retrieve.getSurvivalTime() < System.currentTimeMillis()) {
                         throw new CacheExpirationException(String.format("RxCache: 缓存过期!!! ProviderKey: %s DynamicKey: %s DynamicGroupKey: %s",
                                 configure.getProviderKey(),
                                 configure.getDynamicKey(),
