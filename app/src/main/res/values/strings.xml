@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">RxCache</string>
+    <array name="type">
+        <item>CacheControl</item>
+        <item>NetworkPriority</item>
+        <item>CachePriority</item>
+        <item>NetworkOnly</item>
+        <item>Cache0nly</item>
+    </array>
 </resources>

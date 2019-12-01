@@ -1,12 +1,11 @@
 package com.qr.core.library.rxcache.configuration;
 
 
-import com.qr.core.library.rxcache.DynamicGroupKey;
-import com.qr.core.library.rxcache.DynamicKey;
-import com.qr.core.library.rxcache.EvictKey;
+import com.qr.core.library.rxcache.keys.CacheStrategyKey;
+import com.qr.core.library.rxcache.keys.DynamicKey;
+import com.qr.core.library.rxcache.keys.EvictKey;
 import com.qr.core.library.rxcache.annotation.LifeCache;
 import com.qr.core.library.rxcache.annotation.ProviderKey;
-import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -30,14 +29,15 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
 
     @Override
     public <T> Configure<T> process(Method method, Object[] args) {
-        Configure<T> cacheConfigure = getCacheConfigure(method, args);
-        Configure<T> configure = new Configure<>(cacheConfigure.getProviderKey(), cacheConfigure.getCacheStrategy(), cacheConfigure.getSurvivalTime());
-        DynamicGroupKey dynamicGroupKey = getDynamicGroupKey(method, args);
-        EvictKey evictKey = getEvictKey(method, args);
+        Configure<T> configure = getCacheConfigure(method, args);
         configure.loaderObservable = getLoaderObservable(method, args);
-        configure.dynamicGroupKey = dynamicGroupKey.getDynamicGroupKey().toString();
-        configure.dynamicKey = dynamicGroupKey.getDynamicKey().toString();
+        CacheStrategyKey cacheStrategyKey = getCacheStrategyKey(method, args);
+        configure.cacheStrategy = cacheStrategyKey.getOnCacheStrategy();
+        DynamicKey dynamicKeys = getDynamicKeys(method, args);
+        configure.dynamicKeys = dynamicKeys.getDynamicKeys();
+        EvictKey evictKey = getEvictKey(method, args);
         configure.evict = evictKey.isEvict();
+
         return configure;
     }
 
@@ -48,14 +48,12 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
             if (result == null) {
                 ProviderKey providerKey = method.getAnnotation(ProviderKey.class);
                 LifeCache lifeCache = method.getAnnotation(LifeCache.class);
+
                 String provider;
-                int cacheStrategy;
-                if (providerKey == null) {
-                    provider = method.getName();
-                    cacheStrategy = OnCacheStrategy.Default;
-                } else {
+                if (providerKey != null) {
                     provider = providerKey.providerKey();
-                    cacheStrategy = providerKey.onCacheStrategy();
+                } else {
+                    provider = method.getName();
                 }
 
                 long survivalTime;
@@ -65,14 +63,20 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
                     survivalTime = lifeCache.timeUnit().toMillis(lifeCache.survivalTime());
                 }
 
-                result = new Configure<T>(provider,
-                        cacheStrategy,
-                        survivalTime);
+                result = new Configure<T>(provider, survivalTime);
 
                 configureMap.put(method, result);
             }
         }
         return result;
+    }
+
+    private CacheStrategyKey getCacheStrategyKey(Method method, Object[] args) {
+        CacheStrategyKey cacheStrategyKey = getObjectFromMethodParam(method, args, CacheStrategyKey.class);
+        if (cacheStrategyKey == null) {
+            return new CacheStrategyKey(CacheStrategyKey.CacheControl);
+        }
+        return cacheStrategyKey;
     }
 
     private EvictKey getEvictKey(Method method, Object[] args) {
@@ -84,18 +88,12 @@ public class ConfigureProvidersBehaviour implements ConfigureProviders {
         return evictKey;
     }
 
-    private DynamicGroupKey getDynamicGroupKey(Method method, Object[] args) {
-        DynamicGroupKey dynamicGroupKey = getObjectFromMethodParam(method, args, DynamicGroupKey.class);
-        if (dynamicGroupKey != null) {
-            return dynamicGroupKey;
-        }
-
+    private DynamicKey getDynamicKeys(Method method, Object[] args) {
         DynamicKey dynamicKey = getObjectFromMethodParam(method, args, DynamicKey.class);
-        if (dynamicKey != null) {
-            return new DynamicGroupKey(dynamicKey.getDynamicKey(), "");
+        if (dynamicKey == null) {
+            return new DynamicKey();
         }
-
-        return new DynamicGroupKey("", "");
+        return dynamicKey;
     }
 
     private <T> Observable<T> getLoaderObservable(Method method, Object[] args) {

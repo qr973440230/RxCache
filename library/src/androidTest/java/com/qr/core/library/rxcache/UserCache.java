@@ -2,7 +2,7 @@ package com.qr.core.library.rxcache;
 
 import com.qr.core.library.rxcache.annotation.LifeCache;
 import com.qr.core.library.rxcache.annotation.ProviderKey;
-import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
+import com.qr.core.library.rxcache.keys.DynamicKey;
 
 import java.util.Map;
 
@@ -24,5 +24,5 @@ public interface UserCache {
     Observable<Map<String,User>> userMapCacheControl(Observable<Map<String,User>> observable);
 
     @ProviderKey(providerKey = "user_dynamic_key",onCacheStrategy = OnCacheStrategy.Default)
-    Observable<User> observable(Observable<User> userObservable,DynamicKey dynamicKey);
+    Observable<User> observable(Observable<User> userObservable, DynamicKey dynamicKey);
 }

@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 public class DiskPersistence implements Persistence {
     private final File cacheDirectory;
     private final ParserConfig parserConfig;
+
     @Inject
     public DiskPersistence(File cacheDirectory, ParserConfig parserConfig) {
         this.cacheDirectory = cacheDirectory;
@@ -36,14 +37,14 @@ public class DiskPersistence implements Persistence {
 
         FileWriter fileWriter = null;
         try {
-            File file = new File(cacheDirectory,key);
+            File file = new File(cacheDirectory, key);
             fileWriter = new FileWriter(file);
             fileWriter.write(jsonString);
         } catch (IOException e) {
-            throw  new RuntimeException(e);
-        }finally {
+            throw new RuntimeException(e);
+        } finally {
             try {
-                if(fileWriter != null){
+                if (fileWriter != null) {
                     fileWriter.flush();
                     fileWriter.close();
                 }
@@ -54,21 +55,43 @@ public class DiskPersistence implements Persistence {
     }
 
     @Override
+    public <T> Record<T> retrieveRecord(String key) {
+        key = safetyKey(key);
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(new File(cacheDirectory, key));
+            return JSON.parseObject(inputStream, IOUtils.UTF8,
+                    new TypeReference<Record<T>>() {
+                    }.getType(),
+                    parserConfig);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    @Override
     public void evict(String key) {
         key = safetyKey(key);
-        final File file = new File(cacheDirectory,key);
+        final File file = new File(cacheDirectory, key);
         file.delete();
     }
 
     @Override
     public void evictAll() {
         File[] files = cacheDirectory.listFiles();
-        if(files == null){
+        if (files == null) {
             return;
         }
 
         for (File file : files) {
-            if(file != null){
+            if (file != null) {
                 file.delete();
             }
         }
@@ -78,12 +101,12 @@ public class DiskPersistence implements Persistence {
     public List<String> allKeys() {
         List<String> keys = new ArrayList<>();
         File[] files = cacheDirectory.listFiles();
-        if(files == null){
+        if (files == null) {
             return keys;
         }
 
         for (File file : files) {
-            if(file.isFile()){
+            if (file.isFile()) {
                 keys.add(file.getName());
             }
         }
@@ -95,38 +118,20 @@ public class DiskPersistence implements Persistence {
     public int storedMB() {
         long bytes = 0;
         File[] files = cacheDirectory.listFiles();
-        if(files == null){
+        if (files == null) {
             return 0;
         }
         for (File file : files) {
             bytes += file.length();
         }
 
-        double mbs = Math.ceil((double)bytes / 1024 / 1024);
-        return (int)mbs;
+        double mbs = Math.ceil((double) bytes / 1024 / 1024);
+        return (int) mbs;
     }
 
-    @Override
-    public <T> Record<T> retrieveRecord(String key) {
-        key = safetyKey(key);
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(cacheDirectory,key));
-            return JSON.parseObject(inputStream, IOUtils.UTF8, new TypeReference<Record<T>>(){}.getType(),parserConfig);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }finally {
-            if(inputStream != null){
-                try {
-                    inputStream.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
 
-    private String safetyKey(String key){
-        return key.replaceAll("/","_");
+    private String safetyKey(String key) {
+        return key.replaceAll("/", "_");
     }
 }
 

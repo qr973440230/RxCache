@@ -19,23 +19,21 @@ public final class TwoLayersCache {
         this.retrieveRecord = retrieveRecord;
         this.evictRecord = evictRecord;
     }
-    public <T> void save(final String providerKey,final String dynamicKey,final String dynamicGroupKey,
-                     final T data,final long survivalTime){
-        saveRecord.save(providerKey,dynamicKey,dynamicGroupKey,data,survivalTime);
+
+    public <T> void save(final String providerKey, final Object[] dynamicKeys,
+                         final T data, final long survivalTime) {
+        saveRecord.save(providerKey, dynamicKeys, data, survivalTime);
     }
-    public <T> Record<T> retrieve(final String providerKey, final String dynamicKey, final String dynamicGroupKey){
-        return retrieveRecord.retrieveRecord(providerKey,dynamicKey,dynamicGroupKey);
+
+    public <T> Record<T> retrieve(final String providerKey, final Object[] dynamicKeys) {
+        return retrieveRecord.retrieveRecord(providerKey, dynamicKeys);
     }
-    public void evictProviderKey(String providerKey){
-        evictRecord.evictRecordsMatchingProviderKey(providerKey);
+
+    public void evictDynamicGroupKey(String providerKey, final Object[] dynamicKeys) {
+        evictRecord.evictRecordsMatchingDynamicKey(providerKey, dynamicKeys);
     }
-    public void evictDynamicKey(String providerKey,String dynamicKey){
-        evictRecord.evictRecordsMatchingDynamicKey(providerKey,dynamicKey);
-    }
-    public void evictDynamicGroupKey(String providerKey,String dynamicKey,String dynamicGroupKey){
-        evictRecord.evictRecordsMatchingDynamicGroupKey(providerKey,dynamicKey,dynamicGroupKey);
-    }
-    public void evictAll(){
+
+    public void evictAll() {
         evictRecord.evictAll();
     }
 }

@@ -16,14 +16,14 @@ public class RetrieveRecord extends Action {
         super(memory, persistence);
     }
 
-    public <T> Record<T> retrieveRecord(String providerKey,String dynamicKey,String dynamicGroupKey){
-        String composeKey = composeKey(providerKey, dynamicKey, dynamicGroupKey);
+    public <T> Record<T> retrieveRecord(final String providerKey, final Object[] dynamicKeys) {
+        String composeKey = composeKey(providerKey, dynamicKeys);
         Record record = memory.get(composeKey);
-        if(record == null){
+        if (record == null) {
             try {
                 record = persistence.retrieveRecord(composeKey);
-                memory.put(composeKey,record);
-            }catch (Exception ignore){
+                memory.put(composeKey, record);
+            } catch (Exception ignore) {
                 return null;
             }
         }

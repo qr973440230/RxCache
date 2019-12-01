@@ -1,4 +1,4 @@
-package com.qr.core.library.rxcache;
+package com.qr.core.library.rxcache.keys;
 
 public class EvictKey {
     private final boolean evict;

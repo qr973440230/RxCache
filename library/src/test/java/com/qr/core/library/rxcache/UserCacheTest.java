@@ -1,8 +1,7 @@
 package com.qr.core.library.rxcache;
 
-import android.os.UserManager;
-
 import com.alibaba.fastjson.JSON;
+import com.qr.core.library.rxcache.keys.DynamicKey;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.Observable;
-
-import static org.junit.Assert.*;
 
 public class UserCacheTest {
     Map<String, User> userMap;

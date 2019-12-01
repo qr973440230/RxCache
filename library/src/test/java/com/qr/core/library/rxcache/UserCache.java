@@ -1,8 +1,8 @@
 package com.qr.core.library.rxcache;
 
 import com.qr.core.library.rxcache.annotation.LifeCache;
-import com.qr.core.library.rxcache.annotation.OnCacheStrategy;
 import com.qr.core.library.rxcache.annotation.ProviderKey;
+import com.qr.core.library.rxcache.keys.DynamicKey;
 
 import java.util.Map;
 
