@@ -6,6 +6,7 @@ import com.qr.core.library.rxcache.configuration.Configure;
 import com.qr.core.library.rxcache.configuration.ConfigureProviders;
 import com.qr.core.library.rxcache.exception.CacheExpirationException;
 import com.qr.core.library.rxcache.keys.CacheStrategyKey;
+import com.qr.core.library.rxcache.keys.DynamicKey;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -37,6 +38,11 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
     }
 
     @Override
+    public void evict(String providerKey, Object[] dynamicKeys) {
+        twoLayersCache.evict(providerKey, dynamicKeys);
+    }
+
+    @Override
     public void evictAll() {
         twoLayersCache.evictAll();
     }
@@ -44,7 +50,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
     private <T> Observable<T> getCacheObservable(Configure<T> configure) {
         if (configure.isEvict()) {
             // 先清掉缓存
-            twoLayersCache.evictDynamicGroupKey(configure.getProviderKey(),
+            twoLayersCache.evict(configure.getProviderKey(),
                     configure.getDynamicKeys());
         }
 
@@ -116,7 +122,7 @@ public final class ProcessorProvidersBehaviour implements ProcessorProviders {
                 if (retrieve.getSurvivalTime() > 0) {
                     if (retrieve.getPersistedTime() + retrieve.getSurvivalTime() < System.currentTimeMillis()) {
                         // 缓存过期 清楚缓存
-                        twoLayersCache.evictDynamicGroupKey(configure.getProviderKey(),
+                        twoLayersCache.evict(configure.getProviderKey(),
                                 configure.getDynamicKeys());
                         throw new CacheExpirationException(String.format("RxCache: 缓存过期!!! ProviderKey: %s DynamicKey: %s",
                                 configure.getProviderKey(),

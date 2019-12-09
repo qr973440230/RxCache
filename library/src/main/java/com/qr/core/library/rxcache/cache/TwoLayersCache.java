@@ -29,7 +29,7 @@ public final class TwoLayersCache {
         return retrieveRecord.retrieveRecord(providerKey, dynamicKeys);
     }
 
-    public void evictDynamicGroupKey(String providerKey, final Object[] dynamicKeys) {
+    public void evict(String providerKey, final Object[] dynamicKeys) {
         evictRecord.evictRecordsMatchingDynamicKey(providerKey, dynamicKeys);
     }
 

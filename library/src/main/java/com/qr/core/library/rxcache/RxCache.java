@@ -20,17 +20,21 @@ public class RxCache {
                 .inject(this);
     }
 
-    public <T> T using(Class<T> clazz){
+    public <T> T using(Class<T> clazz) {
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
                 new Class[]{clazz},
                 new ProxyProviders(processorProviders));
     }
 
-    public void evictAll(){
+    public void evict(String providerKey, Object[] dynamicKeys) {
+        processorProviders.evict(providerKey, dynamicKeys);
+    }
+
+    public void evictAll() {
         processorProviders.evictAll();
     }
 
-    public static class Builder{
+    public static class Builder {
         // 缓存目录
         private File cacheDirectory;
 
@@ -39,7 +43,7 @@ public class RxCache {
             return this;
         }
 
-        public RxCache build(){
+        public RxCache build() {
             return new RxCache(this);
         }
     }
